@@ -1,3 +1,6 @@
+app.get('/', (req, res) => {
+    res.send('WhatsApp API is Running Successfully!');
+});
 const { makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
 const express = require('express');
 const pino = require('pino');
