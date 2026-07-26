@@ -1,10 +1,6 @@
-app.get('/', (req, res) => {
-    res.send('WhatsApp API is Running Successfully!');
-});
 const { makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
 const express = require('express');
 const pino = require('pino');
-const qrcodeTerminal = require('qrcode-terminal'); // Agar yeh error de toh isko hata ke simple log kar sakte hain, par Baileys bina web ke bhi terminal par QR dikha sakta hai
 
 const app = express();
 app.use(express.json());
@@ -17,7 +13,7 @@ async function connectToWhatsApp() {
 
     sock = makeWASocket({
         auth: state,
-        printQRInTerminal: true, // Yeh seedha Railway ke Logs mein QR code print kar dega!
+        printQRInTerminal: true, // Logs / Terminal mein QR code dikhega
         logger: pino({ level: 'silent' })
     });
 
@@ -27,7 +23,7 @@ async function connectToWhatsApp() {
         const { connection, lastDisconnect, qr } = update;
 
         if (qr) {
-            console.log('--- QR CODE AAGAYA HAI, LOGS MEIN DEKHO ---');
+            console.log('--- QR CODE GENERATED, CHECK LOGS ---');
         }
 
         if (connection === 'open') {
@@ -47,6 +43,17 @@ async function connectToWhatsApp() {
 }
 
 connectToWhatsApp();
+
+// Home page route taaki "Cannot GET /" na aaye
+app.get('/', (req, res) => {
+    res.send(`
+        <div style="font-family: Arial; text-align: center; margin-top: 50px;">
+            <h2>🚀 WhatsApp API Server is Live!</h2>
+            <p>Status: <b>${isConnected ? 'Connected ✅' : 'Waiting for Scan ⏳'}</b></p>
+            <p>Terminal / Logs mein jakar QR code scan karein.</p>
+        </div>
+    `);
+});
 
 // Message bhejne ki API route
 app.post('/send', async (req, res) => {
